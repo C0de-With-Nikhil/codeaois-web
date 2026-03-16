@@ -41,16 +41,17 @@ To run this project locally on your machine:
 
 2. **Navigate to the directory:**
    ```Bash
-cd codeaois
+    cd codeaois
     ```
 3. **Install the dependencies:**
 
-```Bash
-npm install
-```
+   ```Bash
+   npm install
+   ```
 
 4. **Start the development server:**
 
-```Bash
-npm run dev
-```
+   ```Bash
+   npm run dev
+   ```
+   

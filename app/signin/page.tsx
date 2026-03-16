@@ -5,11 +5,18 @@ import { motion } from "framer-motion";
 import { Terminal, Github, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
+  const router = useRouter(); // <-- ADD THIS LINE
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.info("Authentication system is currently in private beta.");
+    toast.success("Authentication successful! Initializing workspace...");
+
+    // Teleport the user to the dashboard after 1 second!
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 1000);
   };
 
   return (

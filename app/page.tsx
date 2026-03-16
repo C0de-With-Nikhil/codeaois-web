@@ -3,7 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Terminal, Globe, Cpu, Box, X, Send, Twitter, User } from "lucide-react";
-import Faq from "../components/Faq"; // <-- IMPORTED HERE!
+import Faq from "../components/Faq";
+import LogoTicker from "../components/LogoTicker";
+import Cta from "../components/Cta";
+import { createClient } from "@supabase/supabase-js";
+import { toast } from "sonner";
+
+// --- SUPABASE SETUP ---
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- TERMINAL COMPONENT ---
 const TerminalSimulation = () => {
@@ -64,7 +73,7 @@ const TerminalSimulation = () => {
 export default function LandingPage() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
   const installCmd = "curl -fsSL https://codeaois.com/install.sh | bash";
 
   const handleCopy = () => {
@@ -73,13 +82,23 @@ export default function LandingPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleWaitlistSubmit = (e: React.FormEvent) => {
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEmailSubmitted(true);
-    setTimeout(() => {
-      setIsModalOpen(false);
-      setEmailSubmitted(false);
-    }, 3000);
+
+    if (emailInput) {
+      const { error } = await supabase
+        .from("waitlist")
+        .insert([{ email: emailInput }]);
+
+      if (error) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
+    }
+
+    toast.success("Secured! You are on the list.");
+    setIsModalOpen(false);
+    setEmailInput("");
   };
 
   return (
@@ -87,13 +106,27 @@ export default function LandingPage() {
       
       {/* HERO */}
       <section className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="z-10">
+        
+        {/* High-Tech Grid Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none flex justify-center">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        </div>
+
+        {/* Subtle background glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full bg-zinc-900/80 border border-zinc-800 text-sm font-mono text-zinc-400">
             <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span> v1.0.0 Public Beta
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 mb-6">Build, debug & deploy <br /> with AI.</h1>
-          <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10">CodeAOIS is a multi-agent terminal OS for developers.</p>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 mb-6">
+            Build, debug & deploy <br /> with AI.
+          </h1>
+          
+          <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10">
+            CodeAOIS is a multi-agent terminal OS for developers.
+          </p>
           
           <div className="relative mx-auto w-full max-w-2xl group mb-12">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
@@ -105,12 +138,18 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <button onClick={() => setIsModalOpen(true)} className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-zinc-200 transition-all transform hover:scale-105">
+          <button onClick={() => setIsModalOpen(true)} className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-zinc-200 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
             Get Early Access
           </button>
         </motion.div>
-        <TerminalSimulation />
+        
+        <div className="z-10 w-full">
+          <TerminalSimulation />
+        </div>
       </section>
+
+      {/* INFINITE SCROLLING LOGOS */}
+      <LogoTicker />
 
       {/* FEATURES */}
       <section className="py-24 px-6 max-w-6xl mx-auto">
@@ -151,63 +190,36 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold tracking-tight mb-4">Loved by Engineers</h2>
             <p className="text-zinc-400">What the community is saying about CodeAOIS.</p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Tweet 1 */}
             <div className="bg-[#0A0A0A] border border-zinc-800 rounded-2xl p-6 flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white text-sm">Sarah Jenkins</p>
-                    <p className="text-zinc-500 text-xs">@sarahcodes</p>
-                  </div>
+                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400"><User className="w-5 h-5" /></div>
+                  <div><p className="font-semibold text-white text-sm">Sarah Jenkins</p><p className="text-zinc-500 text-xs">@sarahcodes</p></div>
                 </div>
                 <Twitter className="w-5 h-5 text-zinc-600" />
               </div>
-              <p className="text-zinc-300 text-sm leading-relaxed">
-                Just replaced my entire browser-based AI workflow with CodeAOIS. Having the agent stream directly into my terminal and edit files is literal magic. 🤯
-              </p>
+              <p className="text-zinc-300 text-sm leading-relaxed">Just replaced my entire browser-based AI workflow with CodeAOIS. Having the agent stream directly into my terminal and edit files is literal magic. 🤯</p>
             </div>
-
-            {/* Tweet 2 */}
             <div className="bg-[#0A0A0A] border border-zinc-800 rounded-2xl p-6 flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white text-sm">David Chen</p>
-                    <p className="text-zinc-500 text-xs">@dchen_dev</p>
-                  </div>
+                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400"><User className="w-5 h-5" /></div>
+                  <div><p className="font-semibold text-white text-sm">David Chen</p><p className="text-zinc-500 text-xs">@dchen_dev</p></div>
                 </div>
                 <Twitter className="w-5 h-5 text-zinc-600" />
               </div>
-              <p className="text-zinc-300 text-sm leading-relaxed">
-                The Docker sandboxing feature in @CodeAOIS is a lifesaver. It generated an entire Python web scraper, tested it in a container, fixed its own bugs, and then handed me the working code.
-              </p>
+              <p className="text-zinc-300 text-sm leading-relaxed">The Docker sandboxing feature in @CodeAOIS is a lifesaver. It generated an entire Python web scraper, tested it in a container, fixed its own bugs, and then handed me the working code.</p>
             </div>
-
-            {/* Tweet 3 */}
             <div className="bg-[#0A0A0A] border border-zinc-800 rounded-2xl p-6 flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white text-sm">Marcus L.</p>
-                    <p className="text-zinc-500 text-xs">@marcusbuilds</p>
-                  </div>
+                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400"><User className="w-5 h-5" /></div>
+                  <div><p className="font-semibold text-white text-sm">Marcus L.</p><p className="text-zinc-500 text-xs">@marcusbuilds</p></div>
                 </div>
                 <Twitter className="w-5 h-5 text-zinc-600" />
               </div>
-              <p className="text-zinc-300 text-sm leading-relaxed">
-                10x developer? No, I just use CodeAOIS on the Pro tier. This OS is the closest thing to AGI I've used locally. The Minimax integration is incredibly fast. 🚀
-              </p>
+              <p className="text-zinc-300 text-sm leading-relaxed">10x developer? No, I just use CodeAOIS on the Pro tier. This OS is the closest thing to AGI I've used locally. The Minimax integration is incredibly fast. 🚀</p>
             </div>
           </div>
         </div>
@@ -218,8 +230,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { name: "Free", price: "0" },
-            { name: "Elite", price: "5", popular: true },
-            { name: "Pro", price: "100" }
+            { name: "Elite", price: "50", popular: true },
+            { name: "Pro", price: "20" }
           ].map((plan) => (
             <div key={plan.name} className={`p-8 rounded-3xl border ${plan.popular ? 'border-cyan-500 bg-zinc-900/50 scale-105' : 'border-zinc-800'} flex flex-col`}>
               <h3 className="text-lg font-medium mb-2">{plan.name} Tier</h3>
@@ -232,7 +244,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ SECTION (Placed right here!) */}
+      {/* CTA BANNER */}
+      <Cta onOpenWaitlist={() => setIsModalOpen(true)} />
+
+      {/* FAQ */}
       <Faq />
 
       {/* WAITLIST MODAL */}
@@ -240,29 +255,26 @@ export default function LandingPage() {
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-md bg-[#111] border border-zinc-800 p-8 rounded-3xl shadow-2xl">
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-md bg-[#111] border border-zinc-800 p-8 rounded-3xl shadow-2xl z-10">
               <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"><X /></button>
               
-              {!emailSubmitted ? (
-                <>
-                  <h2 className="text-2xl font-bold mb-2">Join the Waitlist</h2>
-                  <p className="text-zinc-400 mb-6">CodeAOIS is currently in private beta. Leave your email to get an invite.</p>
-                  <form onSubmit={handleWaitlistSubmit} className="space-y-4">
-                    <input required type="email" placeholder="dev@example.com" className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors text-white" />
-                    <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
-                      <Send className="w-4 h-4" /> Secure My Spot
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-8 h-8" />
-                  </div>
-                  <h2 className="text-2xl font-bold mb-2">You're on the list!</h2>
-                  <p className="text-zinc-400">We'll reach out as soon as a spot opens up.</p>
-                </div>
-              )}
+              <h2 className="text-2xl font-bold mb-2">Join the Waitlist</h2>
+              <p className="text-zinc-400 mb-6">CodeAOIS is currently in private beta. Leave your email to get an invite.</p>
+              
+              <form onSubmit={handleWaitlistSubmit} className="space-y-4">
+                <input 
+                  required 
+                  type="email" 
+                  value={emailInput} 
+                  onChange={(e) => setEmailInput(e.target.value)} 
+                  placeholder="dev@example.com" 
+                  className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors text-white" 
+                />
+                <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+                  <Send className="w-4 h-4" /> Secure My Spot
+                </button>
+              </form>
+
             </motion.div>
           </div>
         )}

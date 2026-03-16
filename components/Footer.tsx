@@ -30,9 +30,9 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-4">Product</h3>
             <ul className="space-y-3 text-sm text-zinc-400">
               <li><a href="#" className="hover:text-cyan-400 transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Pricing</a></li>
+              <li><a href="/pricing" className="hover:text-cyan-400 transition-colors">Pricing</a></li>
               <li><a href="#" className="hover:text-cyan-400 transition-colors">Supported Models</a></li>
-              <li><a href="#" className="hover:text-cyan-400 transition-colors">Changelog</a></li>
+              <li><a href="/changelog" className="hover:text-cyan-400 transition-colors">Changelog</a></li>
             </ul>
           </div>
 

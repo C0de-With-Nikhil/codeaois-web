@@ -230,8 +230,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { name: "Free", price: "0" },
-            { name: "Elite", price: "50", popular: true },
-            { name: "Pro", price: "20" }
+            { name: "Elite", price: "99", popular: true },
+            { name: "Pro", price: "29" }
           ].map((plan) => (
             <div key={plan.name} className={`p-8 rounded-3xl border ${plan.popular ? 'border-cyan-500 bg-zinc-900/50 scale-105' : 'border-zinc-800'} flex flex-col`}>
               <h3 className="text-lg font-medium mb-2">{plan.name} Tier</h3>

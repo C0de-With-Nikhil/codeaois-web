@@ -21,7 +21,7 @@ export default function Navbar() {
         <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-zinc-400">
           <a href="/docs" className="hover:text-white transition-colors">Docs</a>
           <a href="#" className="hover:text-white transition-colors">GitHub</a>
-          <a href="#" className="px-4 py-2 bg-white text-black rounded-lg hover:bg-zinc-200 transition-colors font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+          <a href="/signin" className="px-4 py-2 bg-white text-black rounded-lg hover:bg-zinc-200 transition-colors font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)]">
             Sign In
           </a>
         </nav>
@@ -47,7 +47,7 @@ export default function Navbar() {
           >
             <a href="/docs" className="text-zinc-400 hover:text-white font-medium text-lg" onClick={() => setIsOpen(false)}>Docs</a>
             <a href="#" className="text-zinc-400 hover:text-white font-medium text-lg" onClick={() => setIsOpen(false)}>GitHub</a>
-            <a href="#" className="w-full text-center px-4 py-3 bg-white text-black rounded-lg font-semibold text-lg" onClick={() => setIsOpen(false)}>
+            <a href="/signin" className="w-full text-center px-4 py-3 bg-white text-black rounded-lg font-semibold text-lg" onClick={() => setIsOpen(false)}>
               Sign In
             </a>
           </motion.div>

@@ -13,6 +13,9 @@ export default function SignInPage() {
     e.preventDefault();
     toast.success("Authentication successful! Initializing workspace...");
 
+    // This gives the browser the VIP badge for 24 hours
+    document.cookie = "codeaois-session=true; path=/; max-age=86400";
+
     // Teleport the user to the dashboard after 1 second!
     setTimeout(() => {
       router.push("/dashboard");
